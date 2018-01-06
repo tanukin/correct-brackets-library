@@ -1,0 +1,20 @@
+{
+    "name": "anikin-elets/correct-brackets",
+    "description": "Return true if the line is correct - all brackets are correctly opened and closed, or false otherwise",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Anikin Ewgeny",
+            "email": "anikin-elets@yandex.ru"
+        }
+    ],
+    "require": {
+        "php": "~7.1"
+    },
+    "autoload":{
+        "psr-4":{
+            "Library\\":"src"
+        }
+    }
+}

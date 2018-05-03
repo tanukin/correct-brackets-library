@@ -2,69 +2,50 @@
 
 namespace Library\Services;
 
-use Library\Exceptions\InvalidArgumentException;
-use Library\Services\dto\BracketDto;
+use Library\Interfaces\BracketServiceInterface;
+use Library\Repository\BracketRepository;
 
-class BracketService
+
+class BracketService implements BracketServiceInterface
 {
     /**
-     * @var BracketDto
+     * @var BracketRepository
      */
-    private $bracketDto;
+    private $repository;
 
-    /**
-     * @var string
-     */
-    private $line;
-
-    const ALLOWED_CHARS = ['(', ')', '\r', '\n', '\t', '\s'];
+    const OPEN = "(";
+    const CLOSE = ")";
 
     /**
      * BracketService constructor.
      *
-     * @param $line
+     * @param BracketRepository $repository
      */
-    public function __construct(string $line)
+    public function __construct(BracketRepository $repository)
     {
-        $this->bracketDto = new BracketDto;
-        $this->line = $line;
+        $this->repository = $repository;
     }
 
     /**
-     * @return bool
-     *
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
-    public function check(): bool
+    public function check(string $line): bool
     {
-        $this->isValid($this->line);
-        $this->bracketDto->setLine($this->line)->create();
+        $arr = str_split($line);
 
-        foreach (str_split($this->bracketDto->getBrackets()->getLine()) as $key => $item) {
+        foreach ($arr as $item) {
             switch ($item) {
-                case '(':
-                    $this->bracketDto->getBrackets()->incOpenBkt();
+                case self::OPEN:
+                    $this->repository->incOpen();
                     break;
-                case ')':
-                    $this->bracketDto->getBrackets()->incCloseBkt();
+                case self::CLOSE:
+                    $this->repository->incClose();
                     break;
             }
-            if ($this->bracketDto->getBrackets()->difference() < 0)
+            if ($this->repository->difference() < 0)
                 return false;
         }
-        return $this->bracketDto->getBrackets()->difference() == 0 ? true : false;
-    }
 
-    /**
-     * @param $line
-     *
-     * @throws InvalidArgumentException
-     */
-    public function isValid(string $line): void
-    {
-        $isValid = !preg_match('~[^\\' . implode(BracketService::ALLOWED_CHARS) . ']~', $line);
-
-        if ($isValid !== true)
-            throw new InvalidArgumentException("The line uses forbidden characters.");
+        return $this->repository->difference() == 0 ? true : false;
     }
 }

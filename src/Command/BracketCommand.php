@@ -11,7 +11,6 @@ use Library\Services\BracketService;
 
 class BracketCommand implements BracketCommandInterface
 {
-
     /**
      * @var string
      */

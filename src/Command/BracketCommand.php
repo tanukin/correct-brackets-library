@@ -5,10 +5,11 @@ namespace Library\Command;
 use Library\Controllers\BracketController;
 use Library\Core\BracketValidate;
 use Library\Exceptions\InvalidArgumentException;
+use Library\Interfaces\BracketCommandInterface;
 use Library\Repository\BracketRepository;
 use Library\Services\BracketService;
 
-class BracketCommand
+class BracketCommand implements BracketCommandInterface
 {
 
     /**

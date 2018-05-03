@@ -4,23 +4,6 @@ use PHPUnit\Framework\TestCase;
 
 class BracketServiceTest extends TestCase{
 
-
-    public function isValidOkDataProvider() {
-        return array(
-            array('()'),
-            array('(()
-                    )()'),
-        );
-    }
-
-    /**
-     * @dataProvider isValidOkDataProvider
-     */
-    public function testIsValidOk($link){
-        $bracketService = new \Library\Services\BracketService($link);
-        $this->assertTrue($bracketService->isValid($link));
-    }
-
     public function isValidFailDataProvider() {
         return array(
             array('((a
@@ -29,13 +12,15 @@ class BracketServiceTest extends TestCase{
                     )()'),
         );
     }
+
     /**
      * @dataProvider isValidFailDataProvider
      * @expectedException \Library\Exceptions\InvalidArgumentException
      */
     public function testIsValidFail($link){
         $bracketService = new \Library\Services\BracketService($link);
-        $this->assertFalse($bracketService->isValid($link));
+        $bracketService->isValid($link);
+        $this->expectExceptionMessage("The line uses forbidden characters.");
     }
 
 

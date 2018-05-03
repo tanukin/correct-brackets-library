@@ -1,56 +1,51 @@
 <?php
- namespace Library\Services;
 
- use Library\Exceptions\InvalidArgumentException;
- use Library\Services\dto\BracketDto;
+namespace Library\Services;
 
- class BracketService{
+use Library\Interfaces\BracketServiceInterface;
+use Library\Repository\BracketRepository;
 
-     private $bracketDto;
-     const ALLOWED_CHARS = ['(',')','\r', '\n', '\t', '\s'];
 
-     /**
-      * BracketService constructor.
-      * @param $line
-      * @throws InvalidArgumentException
-      */
-     public function __construct(string $line)
-     {
-         $this->bracketDto = new BracketDto;
-         if(!$this->isValid($line))
-             throw new InvalidArgumentException("The line uses forbidden characters.");
-         $this->bracketDto->setLine($line)->create();
-     }
+class BracketService implements BracketServiceInterface
+{
+    /**
+     * @var BracketRepository
+     */
+    private $repository;
 
-     /**
-      * @return bool
-      */
-     public function check():bool
-     {
-         foreach (str_split($this->bracketDto->getBrackets()->getLine()) as $key=>$item)
-         {
-             switch ($item)
-             {
-                 case '(':
-                     $this->bracketDto->getBrackets()->incOpenBkt();
-                     break;
-                 case ')':
-                     $this->bracketDto->getBrackets()->incCloseBkt();
-                     break;
-             }
-             if($this->bracketDto->getBrackets()->difference() < 0)
-                 return false;
-         }
-         return $this->bracketDto->getBrackets()->difference()== 0? true: false;
-     }
+    const OPEN = "(";
+    const CLOSE = ")";
 
-     /**
-      * @param $line
-      * @return bool
-      */
-     public function isValid($line):bool
-     {
-         $isValid = !preg_match('~[^\\'.implode(BracketService::ALLOWED_CHARS).']~', $line);
-         return $isValid === true;
-     }
- }
+    /**
+     * BracketService constructor.
+     *
+     * @param BracketRepository $repository
+     */
+    public function __construct(BracketRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function check(string $line): bool
+    {
+        $arr = str_split($line);
+
+        foreach ($arr as $item) {
+            switch ($item) {
+                case self::OPEN:
+                    $this->repository->incOpen();
+                    break;
+                case self::CLOSE:
+                    $this->repository->incClose();
+                    break;
+            }
+            if ($this->repository->difference() < 0)
+                return false;
+        }
+
+        return $this->repository->difference() == 0 ? true : false;
+    }
+}
